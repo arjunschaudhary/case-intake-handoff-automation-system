@@ -37,7 +37,8 @@ Built an automated workflow using n8n that:
 ### Input
 Incoming_Cases sheet:
 - client_name  
-- service_type  
+- service_type
+- company_name
 - priority  
 - readiness_status  
 - notes_summary  
