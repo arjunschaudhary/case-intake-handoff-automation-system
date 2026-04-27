@@ -1,0 +1,1412 @@
+{
+  "name": "Case Intake to Handoff Automation System",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b480d5a-614c-42f0-8931-1abe56f2b1d4",
+              "name": "task_status",
+              "value": "Waiting on Clarification",
+              "type": "string"
+            },
+            {
+              "id": "8fef24fd-b8e2-40ad-9780-1f0ce78388f0",
+              "name": "assigned_owner",
+              "value": "Onboarding Team",
+              "type": "string"
+            },
+            {
+              "id": "66174fb0-02b2-4873-9362-f7b14e32b6e4",
+              "name": "escalation_flag",
+              "value": "No",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        240
+      ],
+      "id": "a138d4ad-7676-4038-ad54-1ea4e73189d0",
+      "name": "Handle Incomplete Case"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3e3df827-0505-4f96-afb2-e702f8b5ee57",
+              "name": "due_date",
+              "value": "={{\n  ($('Read Incoming Cases').item.json.priority === \"Urgent\"\n    ? new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)\n    : $('Read Incoming Cases').item.json.priority === \"High\"\n    ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)\n    : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)\n  ).toISOString().split('T')[0]\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        -176
+      ],
+      "id": "a352cb26-c8e7-4102-9bb5-13696a1c0dbb",
+      "name": "Set Due Date (Based on Priority)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6cc749f0-9753-4279-ac67-ef9584acf5d2",
+              "name": "assigned_owner",
+              "value": "Ops Manager",
+              "type": "string"
+            },
+            {
+              "id": "be08f4c5-76cf-47e4-8bcc-ba88f1bb2a67",
+              "name": "task_status",
+              "value": "Assigned",
+              "type": "string"
+            },
+            {
+              "id": "e2c8c980-b2fc-4dfb-baf1-4e813b0bc897",
+              "name": "escalation_flag",
+              "value": "No",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        64
+      ],
+      "id": "8b2cc5e3-4599-49d2-a120-4a08f971c37a",
+      "name": "Assign Ops Manager"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g",
+          "mode": "list",
+          "cachedResultName": "Internal Handoff & Task Control Workflow.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1917608766,
+          "mode": "list",
+          "cachedResultName": "Incoming_Cases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit#gid=1917608766"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "73aba699-a13f-4865-8e5d-d7385633d7c5",
+      "name": "Read Incoming Cases",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nw1hP4VILgn3a3t9",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cdc51692-3156-49f2-ab55-07fc57f0d990",
+              "leftValue": "={{ $('Read Incoming Cases').item.json.processing_status }}",
+              "rightValue": "New",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        0
+      ],
+      "id": "d0f9c1cd-23b7-444e-a187-836464eb5c2f",
+      "name": "Check New Case"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g",
+          "mode": "list",
+          "cachedResultName": "Internal Handoff & Task Control Workflow.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1793720369,
+          "mode": "list",
+          "cachedResultName": "Handoff_Control",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit#gid=1793720369"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Service Type": "={{ $('Read Incoming Cases').item.json.service_type }}",
+            "Priority": "={{ $('Read Incoming Cases').item.json.priority }}",
+            "Readiness Status": "={{ $('Read Incoming Cases').item.json.readiness_status }}",
+            "Assigned Owner": "={{ $('Assign Ops Manager').item.json.assigned_owner }}",
+            "Task Status": "={{ $('Assign Ops Manager').item.json.task_status }}",
+            "Due Date": "={{ $json.due_date }}",
+            "Escalation Flag": "={{ $('Assign Ops Manager').item.json.escalation_flag }}",
+            "Company Name": "={{ $('Read Incoming Cases').item.json.company_name }}",
+            "Client Name": "=    {{ $('Read Incoming Cases').item.json.client_name }}",
+            "Created Date": "={{ $('Add Created Date').item.json.created_date }}",
+            "Case ID": "={{ $('Read Incoming Cases').item.json.case_id }}",
+            "Notes / Summary": "={{ $('Read Incoming Cases').item.json.notes_summary }}"
+          },
+          "matchingColumns": [
+            "Client Name"
+          ],
+          "schema": [
+            {
+              "id": "Case ID",
+              "displayName": "Case ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Readiness Status",
+              "displayName": "Readiness Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assigned Owner",
+              "displayName": "Assigned Owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Task Status",
+              "displayName": "Task Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created Date",
+              "displayName": "Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Escalation Flag",
+              "displayName": "Escalation Flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Manual Override",
+              "displayName": "Manual Override",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes / Summary",
+              "displayName": "Notes / Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        64
+      ],
+      "id": "fa7186f5-3f5a-4317-85e2-361048269384",
+      "name": "Save Review Handoff",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nw1hP4VILgn3a3t9",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f2a0be86-4b84-425f-8340-3bc2a821a68a",
+              "name": "created_date",
+              "value": "={{ new Date().toISOString().split('T')[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6e92f7ed-9942-47d4-b95e-33f9b1131fcb",
+      "name": "Add Created Date"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        0
+      ],
+      "id": "c764eb89-6a00-45c7-ac4c-82f456667154",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "96dccca3-2010-43c5-8ddc-d2a993d7d739",
+              "name": "assigned_owner",
+              "value": "={{   ({     \"Automation Workflow\": \"Automation Team\",     \"Lead Management\": \"Sales Ops Team\",     \"Client Onboarding\": \"Onboarding Team\",     \"Reporting Dashboard\": \"Reporting Team\",     \"Website Setup\": \"Website Team\",     \"Social Media Setup\": \"Marketing Team\",     \"Data Analysis\": \"Data Analyst Team\"   })[$('Read Incoming Cases').item.json.service_type] }}",
+              "type": "string"
+            },
+            {
+              "id": "6bb40b9b-8ec2-4b30-ab21-6d434c33a6e6",
+              "name": "task_status",
+              "value": "Assigned",
+              "type": "string"
+            },
+            {
+              "id": "a7563901-964b-446c-a023-23787a963933",
+              "name": "escalation_flag",
+              "value": "No",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -176
+      ],
+      "id": "c749fad6-572d-440d-b4cd-a5ee15227030",
+      "name": "Assign Owner (Service Type)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d579006f-979c-44d2-9243-0591603276c1",
+              "leftValue": "={{ $('Read Incoming Cases').item.json.readiness_status }}",
+              "rightValue": "Review Needed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        144
+      ],
+      "id": "ca39bfbd-c433-4335-a42a-273519058909",
+      "name": "Check Review Requirement"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3e3df827-0505-4f96-afb2-e702f8b5ee57",
+              "name": "=due_date",
+              "value": "={{ \n  ($json.priority === \"Urgent\"\n    ? new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)\n    : $json.priority === \"High\"\n    ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)\n    : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)\n  ).toISOString().split('T')[0]\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        64
+      ],
+      "id": "c6838ac9-7b00-4c46-8a25-6cc3ff7b5717",
+      "name": "Set Review Due Date"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g",
+          "mode": "list",
+          "cachedResultName": "Internal Handoff & Task Control Workflow.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1793720369,
+          "mode": "list",
+          "cachedResultName": "Handoff_Control",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit#gid=1793720369"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Service Type": "={{ $('Read Incoming Cases').item.json.service_type }}",
+            "Priority": "={{ $('Read Incoming Cases').item.json.priority }}",
+            "Readiness Status": "={{ $('Read Incoming Cases').item.json.readiness_status }}",
+            "Assigned Owner": "={{ $json.assigned_owner }}",
+            "Task Status": "={{ $json.task_status }}",
+            "Due Date": "=",
+            "Escalation Flag": "={{ $json.escalation_flag }}",
+            "Company Name": "={{ $('Read Incoming Cases').item.json.company_name }}",
+            "Client Name": "=    {{ $('Read Incoming Cases').item.json.client_name }}",
+            "Created Date": "={{ $('Add Created Date').item.json.created_date }}",
+            "Case ID": "={{ $('Read Incoming Cases').item.json.case_id }}",
+            "Notes / Summary": "={{ $('Read Incoming Cases').item.json.notes_summary }}"
+          },
+          "matchingColumns": [
+            "Client Name"
+          ],
+          "schema": [
+            {
+              "id": "Case ID",
+              "displayName": "Case ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Readiness Status",
+              "displayName": "Readiness Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assigned Owner",
+              "displayName": "Assigned Owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Task Status",
+              "displayName": "Task Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created Date",
+              "displayName": "Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Escalation Flag",
+              "displayName": "Escalation Flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Manual Override",
+              "displayName": "Manual Override",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes / Summary",
+              "displayName": "Notes / Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1104,
+        240
+      ],
+      "id": "0d473dc3-28da-479f-88c6-29683b576100",
+      "name": "Save Incomplete Handoff",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nw1hP4VILgn3a3t9",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6547df5c-e55d-416e-9a2a-489770d8b163",
+              "leftValue": "={{ $('Read Incoming Cases').item.json.readiness_status }}",
+              "rightValue": "Ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        0
+      ],
+      "id": "80abf7bd-6501-4361-8fc8-87cd2b3a452b",
+      "name": "Validate Readiness Status"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g",
+          "mode": "list",
+          "cachedResultName": "Internal Handoff & Task Control Workflow.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1917608766,
+          "mode": "list",
+          "cachedResultName": "Incoming_Cases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit#gid=1917608766"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing_status": "Processed",
+            "case_id": "={{ $('Read Incoming Cases').item.json.case_id }}"
+          },
+          "matchingColumns": [
+            "case_id"
+          ],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service_type",
+              "displayName": "service_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "readiness_status",
+              "displayName": "readiness_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing_status",
+              "displayName": "processing_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "case_id",
+              "displayName": "case_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        -176
+      ],
+      "id": "53e1fba0-a3ce-40eb-b6b0-ba8c02224da4",
+      "name": "Update Ready Case Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nw1hP4VILgn3a3t9",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g",
+          "mode": "list",
+          "cachedResultName": "Internal Handoff & Task Control Workflow.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1917608766,
+          "mode": "list",
+          "cachedResultName": "Incoming_Cases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit#gid=1917608766"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processing_status": "Processed",
+            "case_id": "={{ $('Read Incoming Cases').item.json.case_id }}"
+          },
+          "matchingColumns": [
+            "case_id"
+          ],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service_type",
+              "displayName": "service_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "readiness_status",
+              "displayName": "readiness_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing_status",
+              "displayName": "processing_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "case_id",
+              "displayName": "case_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        64
+      ],
+      "id": "d68a9d71-af4f-4707-9a13-1484ab184fad",
+      "name": "Update Review Case Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nw1hP4VILgn3a3t9",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g",
+          "mode": "list",
+          "cachedResultName": "Internal Handoff & Task Control Workflow.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1917608766,
+          "mode": "list",
+          "cachedResultName": "Incoming_Cases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit#gid=1917608766"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "case_id": "={{ $('Read Incoming Cases').item.json.case_id }}",
+            "processing_status": "Processed"
+          },
+          "matchingColumns": [
+            "case_id"
+          ],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service_type",
+              "displayName": "service_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "readiness_status",
+              "displayName": "readiness_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processing_status",
+              "displayName": "processing_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "case_id",
+              "displayName": "case_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company_name",
+              "displayName": "company_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        240
+      ],
+      "id": "70642657-268d-4a71-b8dc-2f6a8a8020f7",
+      "name": "Update Incomplete Case Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nw1hP4VILgn3a3t9",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g",
+          "mode": "list",
+          "cachedResultName": "Internal Handoff & Task Control Workflow.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1793720369,
+          "mode": "list",
+          "cachedResultName": "Handoff_Control",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GrxLWamF_tdQs9tMMQBCRj0YQ_nwRsRJpwPywgCTn5g/edit#gid=1793720369"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Service Type": "={{ $('Read Incoming Cases').item.json.service_type }}",
+            "Priority": "={{ $('Read Incoming Cases').item.json.priority }}",
+            "Readiness Status": "={{ $('Read Incoming Cases').item.json.readiness_status }}",
+            "Assigned Owner": "={{ $('Assign Owner (Service Type)').item.json.assigned_owner }}",
+            "Task Status": "={{ $('Assign Owner (Service Type)').item.json.task_status }}",
+            "Due Date": "={{ $json.due_date }}",
+            "Escalation Flag": "={{ $('Assign Owner (Service Type)').item.json.escalation_flag }}",
+            "Company Name": "={{ $('Read Incoming Cases').item.json.company_name }}",
+            "Client Name": "=    {{ $('Read Incoming Cases').item.json.client_name }}",
+            "Created Date": "={{ $('Add Created Date').item.json.created_date }}",
+            "Case ID": "={{ $('Read Incoming Cases').item.json.case_id }}",
+            "Notes / Summary": "={{ $('Read Incoming Cases').item.json.notes_summary }}"
+          },
+          "matchingColumns": [
+            "Client Name"
+          ],
+          "schema": [
+            {
+              "id": "Case ID",
+              "displayName": "Case ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Readiness Status",
+              "displayName": "Readiness Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assigned Owner",
+              "displayName": "Assigned Owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Task Status",
+              "displayName": "Task Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created Date",
+              "displayName": "Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Escalation Flag",
+              "displayName": "Escalation Flag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Manual Override",
+              "displayName": "Manual Override",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes / Summary",
+              "displayName": "Notes / Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1104,
+        -176
+      ],
+      "id": "23737913-c4ea-4d7b-a2c6-5d1a1d984850",
+      "name": "Save Ready Handoff",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Nw1hP4VILgn3a3t9",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set Due Date (Based on Priority)": {
+      "main": [
+        [
+          {
+            "node": "Save Ready Handoff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Incomplete Case": {
+      "main": [
+        [
+          {
+            "node": "Save Incomplete Handoff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Ops Manager": {
+      "main": [
+        [
+          {
+            "node": "Set Review Due Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Incoming Cases": {
+      "main": [
+        [
+          {
+            "node": "Add Created Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check New Case": {
+      "main": [
+        [
+          {
+            "node": "Validate Readiness Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Review Handoff": {
+      "main": [
+        [
+          {
+            "node": "Update Review Case Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Created Date": {
+      "main": [
+        [
+          {
+            "node": "Check New Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Incoming Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Owner (Service Type)": {
+      "main": [
+        [
+          {
+            "node": "Set Due Date (Based on Priority)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Review Requirement": {
+      "main": [
+        [
+          {
+            "node": "Assign Ops Manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Incomplete Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Review Due Date": {
+      "main": [
+        [
+          {
+            "node": "Save Review Handoff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Incomplete Handoff": {
+      "main": [
+        [
+          {
+            "node": "Update Incomplete Case Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Readiness Status": {
+      "main": [
+        [
+          {
+            "node": "Assign Owner (Service Type)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Review Requirement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Ready Handoff": {
+      "main": [
+        [
+          {
+            "node": "Update Ready Case Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7f5ad104-0b14-470d-9ba5-fd4a23d37bf8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "379be1386c3b79ce14d30b22a98f8c56d8561975a4a848b9314e17a657a23b9f"
+  },
+  "id": "sABeudnx6kIoOX40",
+  "tags": []
+}
